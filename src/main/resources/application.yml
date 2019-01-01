@@ -1,0 +1,11 @@
+server:
+  error:
+    whitelabel:
+      enabled: true
+
+spring:
+  thymeleaf:
+    template-resolver-order: 0
+
+application:
+  bookdirectory: "/home/ravil/Books"
