@@ -2,6 +2,8 @@
 package ars.utility.library.controllers;
 
 import ars.utility.library.services.BookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -20,11 +22,13 @@ import java.io.IOException;
 @Controller
 public class HomeController {
 
+    private  static Logger logger = LoggerFactory.getLogger(HomeController.class);
+
     @Autowired
     BookService bookService;
 
     @GetMapping("/")
-    public String greeting(@RequestParam(name="name", required=false, defaultValue="Ravil") String name, Model model) throws IOException {
+    public String greeting(@RequestParam(name="name", required=false, defaultValue="Reader") String name, Model model) throws IOException {
         model.addAttribute("name",name);
         model.addAttribute("books", bookService.findAll());
         return "home";
@@ -37,13 +41,15 @@ public class HomeController {
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+f.getName());
+            logger.info(String.format("Transfer file %s",f.getName()));
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(f.length())
                     .contentType(MediaType.parseMediaType("application/octet-stream"))
                     .body(resource);
         } else {
-            return ResponseEntity.ok().body(null);
+            logger.info(String.format("Requested file %s not found",f.getName()));
+            return ResponseEntity.notFound().build();
         }
 
 
